@@ -1,0 +1,28 @@
+import numpy as np
+from sklearn.model_selection import train_test_split
+
+# Assuming you have a list of image file paths and their corresponding captions
+image_file_paths = ['image1.jpg', 'image2.jpg', ...]
+captions = ['caption for image 1', 'caption for image 2', ...]
+
+# Set the random seed for reproducibility
+seed = 42
+
+# Split the data into train, validation, and test sets
+# Typically, you would use a larger portion for training (e.g., 70%) and smaller portions for validation and testing
+train_ratio = 0.7
+val_ratio = 0.15
+test_ratio = 0.15
+
+# First, split into training and the remaining data
+train_images, remaining_images, train_captions, remaining_captions = train_test_split(
+    image_file_paths, captions, train_size=train_ratio, random_state=seed, shuffle=True)
+
+# Next, split the remaining data into validation and test
+val_images, test_images, val_captions, test_captions = train_test_split(
+    remaining_images, remaining_captions, test_size=test_ratio / (test_ratio + val_ratio), random_state=seed, shuffle=True)
+
+# Now, you have separate lists for training, validation, and test data
+print(f"Number of training samples: {len(train_images)}")
+print(f"Number of validation samples: {len(val_images)}")
+print(f"Number of test samples: {len(test_images)}")
