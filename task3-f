@@ -1,0 +1,45 @@
+import tensorflow as tf
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+
+# Define a custom data generator/loader
+class CaptionDataGenerator(tf.keras.utils.Sequence):
+    def __init__(self, image_paths, captions, tokenizer, max_sequence_length, batch_size, image_preprocessor):
+        self.image_paths = image_paths
+        self.captions = captions
+        self.tokenizer = tokenizer
+        self.max_sequence_length = max_sequence_length
+        self.batch_size = batch_size
+        self.image_preprocessor = image_preprocessor
+
+    def __len__(self):
+        return int(np.ceil(len(self.image_paths) / self.batch_size))
+
+    def __getitem__(self, idx):
+        batch_image_paths = self.image_paths[idx * self.batch_size:(idx + 1) * self.batch_size]
+        batch_captions = self.captions[idx * self.batch_size:(idx + 1) * self.batch_size]
+
+        # Load and preprocess images
+        batch_images = [self.image_preprocessor(img_path) for img_path in batch_image_paths]
+
+        # Tokenize and pad captions
+        batch_sequences = self.tokenizer.texts_to_sequences(batch_captions)
+        batch_padded_sequences = pad_sequences(batch_sequences, maxlen=self.max_sequence_length, padding='post')
+
+        # Prepare inputs and outputs for the model
+        X = {'image_input': np.array(batch_images)}
+        y = {'caption_output': batch_padded_sequences}
+
+        return X, y
+
+# Create a data generator/loader
+batch_size = 32  # Adjust this based on your system's memory
+data_generator = CaptionDataGenerator(
+    train_images, train_captions, tokenizer, max_sequence_length, batch_size, preprocess_image)
+
+# Example usage during model training
+for epoch in range(num_epochs):
+    for batch in data_generator:
+        # Batch contains image inputs and caption outputs
+        X, y = batch
+        # Train the model using this batch
+        model.train_on_batch(X, y)
