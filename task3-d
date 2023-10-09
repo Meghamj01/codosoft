@@ -1,0 +1,19 @@
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+
+# Sample sequences (list of lists)
+sequences = [
+    [1, 2, 3],
+    [4, 5],
+    [6, 7, 8, 9],
+    [10]
+]
+
+# Pad sequences to a fixed length (e.g., maxlen=4)
+maxlen = 4
+padded_sequences = pad_sequences(sequences, maxlen=maxlen, padding='post', truncating='post', value=0)
+
+# 'padding' argument specifies whether to pad sequences at the beginning or end
+# 'truncating' argument specifies whether to truncate sequences at the beginning or end
+# 'value' argument specifies the padding value (default is 0)
+
+print(padded_sequences)
