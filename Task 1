@@ -1,0 +1,35 @@
+#CHATBOT WITH RULE-BASED RESPONSES
+
+
+import re
+import random
+
+rules = {
+    r'(hello|hi|hey)': ['Hello!', 'Hi there!', 'Hey!'],
+    r'how are you': ["I'm good, thanks!", "I'm doing well, how about you?"],
+    r'what is your name': ['I am a chatbot.', 'I do not have a name.']
+}
+
+
+
+def chat(input_text):
+    input_text = input_text.lower()  # Convert input to lowercase for case-insensitive matching
+    
+    if 'hello' in input_text or 'hi' in input_text or 'hey' in input_text:
+        return random.choice(['Hello!', 'Hi there!', 'Hey!'])
+    
+    if 'how are you' in input_text:
+        return random.choice(["I'm good, thanks!", "I'm doing well, how about you?"])
+    
+    if 'what is your name' in input_text:
+        return random.choice(['I am a chatbot.', 'I do not have a name.'])
+    
+    return "I don't understand that. Please ask another question."
+
+while True:
+    user_input = input("You: ")
+    if user_input.lower() in ['exit', 'quit', 'bye']:
+        print("Chatbot: Goodbye!")
+        break
+    response = chat(user_input)
+    print("Chatbot:", response)
