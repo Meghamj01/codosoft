@@ -1,0 +1,34 @@
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Embedding, LSTM, Dense
+from tensorflow.keras.optimizers import Adam
+
+# Define the caption generation model
+def create_captioning_model(vocab_size, max_caption_length, embedding_dim, lstm_units):
+    model = Sequential()
+
+    # Add an embedding layer to convert word indices to dense vectors
+    model.add(Embedding(input_dim=vocab_size, output_dim=embedding_dim, input_length=max_caption_length))
+
+    # Add an LSTM layer to generate captions sequentially
+    model.add(LSTM(units=lstm_units, return_sequences=True))
+
+    # Add a dense layer with a softmax activation to predict the next word in the sequence
+    model.add(Dense(units=vocab_size, activation='softmax'))
+
+    return model
+
+# Example usage
+vocab_size = len(tokenizer.word_index) + 1  # Vocabulary size from the tokenization step
+max_caption_length = preprocessed_captions.shape[1]  # Maximum caption length
+embedding_dim = 256  # Dimensionality of word embeddings
+lstm_units = 512  # Number of LSTM units
+
+# Create the caption generation model
+caption_model = create_captioning_model(vocab_size, max_caption_length, embedding_dim, lstm_units)
+
+# Compile the model
+caption_model.compile(loss='categorical_crossentropy', optimizer=Adam(learning_rate=0.001))
+
+# Print model summary to inspect the architecture
+caption_model.summary()
