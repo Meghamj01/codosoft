@@ -1,0 +1,22 @@
+import tensorflow as tf
+from tensorflow.keras.applications import VGG16  # You can use other pre-trained models like ResNet or Inception
+
+# Load the pre-trained CNN model (e.g., VGG16) without the top classification layer
+base_model = VGG16(weights='imagenet', include_top=False, input_shape=(224, 224, 3))
+
+# Create a new model by removing the top layers and making the base model non-trainable
+model = tf.keras.models.Model(inputs=base_model.input, outputs=base_model.layers[-1].output)
+model.trainable = False
+
+# Preprocess your images (assuming you have a list of preprocessed images)
+preprocessed_images = ...
+
+# Extract features from your preprocessed images
+def extract_features(images):
+    features = model.predict(images)
+    return features
+
+# Example usage
+image_features = extract_features(preprocessed_images)
+
+# The 'image_features' variable now contains the extracted features for your images
