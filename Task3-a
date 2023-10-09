@@ -1,0 +1,52 @@
+#DATA PREPROCESSING
+import tensorflow as tf
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+
+# Load and preprocess images
+def preprocess_image(image_path):
+    img = tf.io.read_file(image_path)
+    img = tf.image.decode_jpeg(img, channels=3)
+    img = tf.image.resize(img, (224, 224))
+    img = tf.image.convert_image_dtype(img, tf.float32)
+    img = tf.image.per_image_standardization(img)  # Normalize pixel values
+    return img
+
+# Tokenize and preprocess captions
+def preprocess_captions(captions):
+    tokenizer = Tokenizer(oov_token="<unk>")
+    tokenizer.fit_on_texts(captions)
+    vocab_size = len(tokenizer.word_index) + 1
+    captions_seqs = tokenizer.texts_to_sequences(captions)
+    captions_seqs = pad_sequences(captions_seqs, padding="post")
+    return tokenizer, vocab_size, captions_seqs
+
+# Split data into train, validation, and test sets
+def split_data(images, captions, train_ratio=0.7, val_ratio=0.15):
+    total_samples = len(images)
+    train_samples = int(total_samples * train_ratio)
+    val_samples = int(total_samples * val_ratio)
+    test_samples = total_samples - train_samples - val_samples
+
+    train_images = images[:train_samples]
+    val_images = images[train_samples:train_samples + val_samples]
+    test_images = images[train_samples + val_samples:]
+
+    train_captions = captions[:train_samples]
+    val_captions = captions[train_samples:train_samples + val_samples]
+    test_captions = captions[train_samples + val_samples:]
+
+    return (train_images, train_captions), (val_images, val_captions), (test_images, test_captions)
+
+# Example usage
+images = ['image1.jpg', 'image2.jpg', ...]  # List of image file paths
+captions = ['a caption for image 1', 'a caption for image 2', ...]  # List of corresponding captions
+
+# Preprocess images
+preprocessed_images = [preprocess_image(img) for img in images]
+
+# Preprocess captions
+tokenizer, vocab_size, preprocessed_captions = preprocess_captions(captions)
+
+# Split data into train, validation, and test sets
+(train_images, train_captions), (val_images, val_captions), (test_images, test_captions) = split_data(preprocessed_images, preprocessed_captions)
