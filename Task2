@@ -1,0 +1,125 @@
+import math
+
+# Constants for the players
+PLAYER_X = 'X'
+PLAYER_O = 'O'
+EMPTY = ' '
+
+# Function to print the Tic-Tac-Toe board
+def print_board(board):
+    for row in board:
+        print(' | '.join(row))
+        print('-' * 9)
+
+# Function to check if a player has won
+def check_win(board, player):
+    # Check rows, columns, and diagonals
+    for i in range(3):
+        if all(board[i][j] == player for j in range(3)):
+            return True
+        if all(board[j][i] == player for j in range(3)):
+            return True
+    if all(board[i][i] == player for i in range(3)) or all(board[i][2 - i] == player for i in range(3)):
+        return True
+    return False
+
+# Function to check if the board is full
+def is_full(board):
+    return all(board[i][j] != EMPTY for i in range(3) for j in range(3))
+
+# Minimax algorithm with Alpha-Beta Pruning
+def minimax(board, depth, is_maximizing, alpha, beta):
+    if check_win(board, PLAYER_X):
+        return 1
+    if check_win(board, PLAYER_O):
+        return -1
+    if is_full(board):
+        return 0
+
+    if is_maximizing:
+        max_eval = -math.inf
+        for i in range(3):
+            for j in range(3):
+                if board[i][j] == EMPTY:
+                    board[i][j] = PLAYER_X
+                    eval = minimax(board, depth + 1, False, alpha, beta)
+                    board[i][j] = EMPTY
+                    max_eval = max(max_eval, eval)
+                    alpha = max(alpha, eval)
+                    if beta <= alpha:
+                        break
+        return max_eval
+    else:
+        min_eval = math.inf
+        for i in range(3):
+            for j in range(3):
+                if board[i][j] == EMPTY:
+                    board[i][j] = PLAYER_O
+                    eval = minimax(board, depth + 1, True, alpha, beta)
+                    board[i][j] = EMPTY
+                    min_eval = min(min_eval, eval)
+                    beta = min(beta, eval)
+                    if beta <= alpha:
+                        break
+        return min_eval
+
+# Function to make the best move for the AI
+def best_move(board):
+    best_eval = -math.inf
+    move = None
+    alpha = -math.inf
+    beta = math.inf
+    for i in range(3):
+        for j in range(3):
+            if board[i][j] == EMPTY:
+                board[i][j] = PLAYER_X
+                eval = minimax(board, 0, False, alpha, beta)
+                board[i][j] = EMPTY
+                if eval > best_eval:
+                    best_eval = eval
+                    move = (i, j)
+    return move
+
+# Main game loop
+def main():
+    board = [[EMPTY, EMPTY, EMPTY],
+             [EMPTY, EMPTY, EMPTY],
+             [EMPTY, EMPTY, EMPTY]]
+    current_player = PLAYER_X
+
+    print("Tic-Tac-Toe - AI vs. Human")
+    print_board(board)
+
+    while True:
+        if current_player == PLAYER_X:
+            row, col = best_move(board)
+            print(f"AI ({PLAYER_X}) chooses row {row + 1}, column {col + 1}")
+            board[row][col] = PLAYER_X
+        else:
+            while True:
+                try:
+                    row = int(input("Enter row (1, 2, or 3): ")) - 1
+                    col = int(input("Enter column (1, 2, or 3): ")) - 1
+                    if 0 <= row < 3 and 0 <= col < 3 and board[row][col] == EMPTY:
+                        break
+                    else:
+                        print("Invalid move. Try again.")
+                except ValueError:
+                    print("Invalid input. Enter a number.")
+
+            board[row][col] = PLAYER_O
+
+        print_board(board)
+
+        if check_win(board, current_player):
+            print(f"{current_player} wins!")
+            break
+        elif is_full(board):
+            print("It's a draw!")
+            break
+
+        current_player = PLAYER_X if current_player == PLAYER_O else PLAYER_O
+
+if __name__ == "__main__":
+    main()
+
